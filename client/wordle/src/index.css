@@ -1,0 +1,20 @@
+html {
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    background-color: hsl(225deg 5.88% 13.33%);
+}
+
+:root {
+    --primary-main: hsl(257.56deg 57.75% 41.76%);
+    --primary-dark: hsl(257.44deg 58.11% 29.02%);
+    --primary-light: hsl(257.14deg 41.18% 53.33%);
+}
