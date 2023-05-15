@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 
-import Line from "./components/Line";
-import Tile from "./components/Tile/Tile";
+import Board from "./components/Board/Board";
+import Line from "./components/Line/Line";
+import Tile, {
+    EMPTY,
+    CORRECT,
+    CLOSE,
+    INCORRECT,
+    TileVariant,
+} from "./components/Tile/Tile";
 
 import useGameState, {
     INITIALIZE,
@@ -17,35 +24,44 @@ import solutions from "./assets/5LetterWords.json";
 
 const inputMatch = /^[a-zA-Z]$/;
 
-function getTileClass(
+function getTileVariant(
     guess: string,
     solution: string,
     lineIdx: number,
     guessIdx: number,
     currentLine: number
-): string {
+): TileVariant {
     // Only apply a class to submitted lines
     if (currentLine <= lineIdx) {
-        return "";
+        return EMPTY;
     }
 
     const letter = guess[guessIdx]?.toLowerCase();
 
     // Can't compare if there is no letter, apply nothing
     if (!letter) {
-        return "";
+        return EMPTY;
     }
 
     solution = solution.toLowerCase();
 
     if (solution.includes(letter)) {
-        return guess[guessIdx] === solution[guessIdx] ? "correct" : "close";
+        return guess[guessIdx] === solution[guessIdx] ? CORRECT : CLOSE;
     }
 
-    return "incorrect";
+    return INCORRECT;
 }
 
-export default function App() {
+function validWord(input: string, wordSet: string[]): boolean {
+    if (input.length !== 5) {
+        return false;
+    }
+
+    // Only words in the word set are considered valid submissions
+    return !!wordSet.find((word) => word.toLowerCase() === input.toLowerCase());
+}
+
+const App = () => {
     const [{ solution, guesses, currentLine, playState }, setGameState] =
         useGameState();
 
@@ -76,7 +92,7 @@ export default function App() {
             switch (e.key) {
                 case "Enter": {
                     // Only allow a submit if the user has a full word
-                    if (input.length === 5) {
+                    if (validWord(input, solutions)) {
                         setGameState({ type: SUBMIT });
                     }
 
@@ -140,38 +156,42 @@ export default function App() {
     }, [guesses, solution, currentLine, setGameState]);
 
     return (
-        <div className="board">
-            {guesses.map((guess, i) => (
-                <Line key={i}>
-                    {solution.split("").map((_char, j) => {
-                        const letter = guess[j];
+        <div style={{ width: "100%", maxWidth: 1200, margin: "0 auto" }}>
+            <Board>
+                {guesses.map((guess, i) => (
+                    <Line key={i}>
+                        {solution.split("").map((_char, j) => {
+                            const letter = guess[j];
 
-                        return (
-                            <Tile
-                                className={getTileClass(
-                                    guess,
-                                    solution,
-                                    i,
-                                    j,
-                                    currentLine
-                                )}
-                                key={j}
-                            >
-                                {letter}
-                            </Tile>
-                        );
-                    })}
-                </Line>
-            ))}
+                            return (
+                                <Tile
+                                    key={j}
+                                    variant={getTileVariant(
+                                        guess,
+                                        solution,
+                                        i,
+                                        j,
+                                        currentLine
+                                    )}
+                                >
+                                    {letter}
+                                </Tile>
+                            );
+                        })}
+                    </Line>
+                ))}
 
-            {playState !== PLAY_STATES.playing && (
-                <button
-                    autoFocus
-                    onClick={(_e) => setGameState({ type: INITIALIZE })}
-                >{`You ${
-                    playState === PLAY_STATES.won ? "Win!" : "Lose."
-                } Play Again?`}</button>
-            )}
+                {playState !== PLAY_STATES.playing && (
+                    <button
+                        autoFocus
+                        onClick={(_e) => setGameState({ type: INITIALIZE })}
+                    >{`You ${
+                        playState === PLAY_STATES.won ? "Win!" : "Lose."
+                    } Play Again?`}</button>
+                )}
+            </Board>
         </div>
     );
-}
+};
+
+export default App;

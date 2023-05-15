@@ -1,4 +1,39 @@
+:root {
+    --tile-width: 4rem;
+    --font-scalar: 0.72;
+}
+
 .container {
     border: 1px solid white;
     border-radius: 0.25rem;
+
+    width: var(--tile-width);
+    aspect-ratio: 1;
+
+    margin: 0;
+    padding: 0;
+
+    font-size: calc(var(--tile-width) * var(--font-scalar));
+    text-align: center;
+    color: white;
+}
+
+.container:not(.empty) {
+    color: black;
+}
+
+.empty {
+    background-color: hsl(225deg 5.88% 18.33%);
+}
+
+.correct {
+    background-color: limegreen;
+}
+
+.close {
+    background-color: yellow;
+}
+
+.incorrect {
+    background-color: lightgray;
 }
